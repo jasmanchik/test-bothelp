@@ -1,0 +1,92 @@
+version: '3'
+services:
+
+    app:
+        build:
+            context: .
+            dockerfile: ./docker/php/Dockerfile
+        container_name: app
+        restart: unless-stopped
+        tty: true
+        environment:
+            SERVICE_NAME: app
+            SERVICE_TAGS: dev
+        working_dir: /var/www
+        depends_on:
+            - db
+            - nosql
+        volumes:
+            - ./:/var/www
+            - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+        networks:
+            - app-network
+
+    webserver:
+        image: nginx:alpine
+        container_name: webserver
+        restart: unless-stopped
+        tty: true
+        ports:
+            - "8080:80"
+            - "443:443"
+        volumes:
+            - ./:/var/www
+            - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+        networks:
+            - app-network
+
+    db:
+        image: mysql:8.0.25
+        container_name: db
+        restart: unless-stopped
+        tty: true
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_DATABASE: database
+            MYSQL_USER: db_user
+            MYSQL_PASSWORD: root
+            MYSQL_ROOT_PASSWORD: root
+            SERVICE_TAGS: dev
+            SERVICE_NAME: mysql
+        volumes:
+            - db-data:/var/lib/mysql
+            - ./docker/mysql/my.cnf:/etc/mysql/my.cnf:ro
+        networks:
+            - app-network
+
+    nosql:
+        image: redis:6.2-alpine
+        restart: always
+        ports:
+            - "6379:6379"
+        command: redis-server --save 60 1 --requirepass MFDNclV13b924a --loglevel
+        volumes:
+            - ./docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
+            - nosql-data:/data
+
+    phpmyadmin:
+        image: phpmyadmin
+        restart: always
+        links:
+            - db
+        ports:
+            - "8081:80"
+        environment:
+            PMA_ARBITRARY: 1
+            PMA_HOST: db
+            PMA_PORT: 3306
+            PMA_USER: db_user
+            PMA_PASSWORD: root
+        networks:
+            - app-network
+
+networks:
+    app-network:
+        driver: bridge
+
+volumes:
+    db-data:
+        driver: local
+    nosql-data:
+        driver: local
