@@ -36,6 +36,7 @@ services:
             - app-network
 
     db:
+        platform: linux/x86_64
         image: mysql:8.0.25
         container_name: db
         restart: unless-stopped
@@ -60,7 +61,7 @@ services:
         restart: always
         ports:
             - "6379:6379"
-        command: redis-server --save 60 1 --requirepass MFDNclV13b924a --loglevel
+        command: redis-server --save 60 1 --requirepass MFDNclV13b924a
         volumes:
             - ./docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
             - nosql-data:/data
