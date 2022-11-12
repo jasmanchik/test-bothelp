@@ -21,7 +21,9 @@ docker-up:
 	docker-compose up -d
 
 docker-down-clear:
+	#docker-compose down
 	docker-compose down -v --remove-orphans
+
 
 docker-pull:
 	docker-compose pull
@@ -36,7 +38,7 @@ composer-install:
 	docker run --rm -v $(current_dir):/app composer install
 
 composer-install-packages:
-	docker-compose exec app sh -c "composer require barryvdh/laravel-debugbar --dev"
+	docker-compose exec app sh -c "composer require barryvdh/laravel-debugbar --dev && composer require --dev barryvdh/laravel-ide-helper"
 
 laravel-migrate:
 	docker-compose exec app sh -c "php artisan migrate"
@@ -46,3 +48,10 @@ laravel-migrate-fresh:
 
 laravel-migrate-fresh-seed:
 	docker-compose exec app sh -c "php artisan migrate:fresh --seed"
+
+run-workers:
+	docker-compose exec app sh -c "php artisan queue:work --queue=user:events:0 &&\
+	 php artisan queue:work --queue=user:events:1 &&\
+	 php artisan queue:work --queue=user:events:2 &&\
+	 php artisan queue:work --queue=user:events:3 &&\
+	 php artisan queue:work --queue=user:events:4";
