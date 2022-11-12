@@ -5,7 +5,7 @@ init: docker-down-clear docker-pull docker-build-pull docker-up
 framework:laravel-install
 
 #install composer packages
-composer:composer-install composer-install-packages
+composer:composer-install #composer-install-packages
 
 #shut down container
 down: docker-down-clear
@@ -48,10 +48,3 @@ laravel-migrate-fresh:
 
 laravel-migrate-fresh-seed:
 	docker-compose exec app sh -c "php artisan migrate:fresh --seed"
-
-run-workers:
-	docker-compose exec app sh -c "php artisan queue:work --queue=user:events:0 &&\
-	 php artisan queue:work --queue=user:events:1 &&\
-	 php artisan queue:work --queue=user:events:2 &&\
-	 php artisan queue:work --queue=user:events:3 &&\
-	 php artisan queue:work --queue=user:events:4";
