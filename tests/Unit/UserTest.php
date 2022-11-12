@@ -7,7 +7,7 @@ use Tests\TestCase;
 
 class UserTest extends TestCase
 {
-    private int $requestsCount = 5;
+    private int $requestsCount = 100;
 
     /**
      * A basic unit test example.
