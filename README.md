@@ -1,4 +1,4 @@
-## Quick docker commands to get your project up on Laravel
+## Тестовое задание на работу с очередями
 
 1) Запуск проекта `make init`
 2) Установить зависимости проекта `make composer`
